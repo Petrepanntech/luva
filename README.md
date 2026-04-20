@@ -17,7 +17,7 @@ A real-time multiplayer web app where couples can play fun games, keep score, an
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/luva.git
+git clone https://github.com/Petrepanntech/luva.git
 cd luva
 
 # Install dependencies
