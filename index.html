@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Luva — A fun couples game app where lovers play childish games, keep score, and exchange love notes.">
+  <title>Luva 💕 Love Games & Notes</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Floating Hearts Background -->
+  <div id="floating-hearts" class="floating-hearts"></div>
+
+  <!-- Toast Notifications -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ===== SETUP SCREEN ===== -->
+  <div id="setup-screen" class="setup-screen">
+    <div class="setup-card">
+      <span class="logo-icon">💕</span>
+      <h1>Luva</h1>
+      <p class="tagline">games, giggles & love notes for two</p>
+
+      <form class="setup-form" onsubmit="event.preventDefault(); startApp();">
+        <div class="input-group">
+          <label for="player1-name">Player 1</label>
+          <input type="text" id="player1-name" placeholder="First lover's name..." maxlength="20" autocomplete="off">
+        </div>
+        <div class="emoji-picker-row" id="emoji-picker-1"></div>
+
+        <div class="vs-divider"><span>&</span></div>
+
+        <div class="input-group">
+          <label for="player2-name">Player 2</label>
+          <input type="text" id="player2-name" placeholder="Second lover's name..." maxlength="20" autocomplete="off">
+        </div>
+        <div class="emoji-picker-row" id="emoji-picker-2"></div>
+
+        <button type="submit" class="btn-primary" id="btn-start">Let's Play! 💝</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MAIN APP ===== -->
+  <div id="main-app" class="app-container main-content" style="display: none;">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <span class="brand-icon">💕</span>
+        <h1>Luva</h1>
+      </div>
+      <div class="header-players">
+        <span class="player-tag p1" id="header-p1"></span>
+        <span class="vs">&</span>
+        <span class="player-tag p2" id="header-p2"></span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" onclick="resetAllData()" title="Reset everything">🗑️</button>
+      </div>
+    </header>
+
+    <!-- Score Strip -->
+    <div class="score-strip" id="score-strip"></div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" id="nav-tabs">
+      <button class="nav-tab active" data-tab="games">
+        <span class="tab-icon">🎮</span>
+        <span class="tab-label">Games</span>
+      </button>
+      <button class="nav-tab" data-tab="leaderboard">
+        <span class="tab-icon">🏆</span>
+        <span class="tab-label">Leaderboard</span>
+      </button>
+      <button class="nav-tab" data-tab="notes">
+        <span class="tab-icon">💌</span>
+        <span class="tab-label">Love Notes</span>
+      </button>
+    </nav>
+
+    <!-- ===== TAB: GAMES ===== -->
+    <div class="tab-content active" id="tab-games">
+
+      <!-- Games List / Selection -->
+      <div id="games-list">
+        <div class="games-grid">
+          <div class="game-card" onclick="openGame('tictactoe')" id="card-tictactoe">
+            <span class="card-emoji">❌⭕</span>
+            <h3>Tic Tac Toe</h3>
+            <p>Classic battle of Xs and Os — who's the strategic genius?</p>
+            <span class="card-badge badge-fun">Fun</span>
+          </div>
+
+          <div class="game-card" onclick="openGame('memory')" id="card-memory">
+            <span class="card-emoji">🧠</span>
+            <h3>Memory Match</h3>
+            <p>Flip cards and find pairs — test who remembers better!</p>
+            <span class="card-badge badge-brain">Brain</span>
+          </div>
+
+          <div class="game-card" onclick="openGame('rps')" id="card-rps">
+            <span class="card-emoji">✂️</span>
+            <h3>Rock Paper Scissors</h3>
+            <p>Best of 3 showdown — luck, strategy, or just vibes?</p>
+            <span class="card-badge badge-quick">Quick</span>
+          </div>
+
+          <div class="game-card" onclick="openGame('truthdare')" id="card-truthdare">
+            <span class="card-emoji">🎭</span>
+            <h3>Truth or Dare</h3>
+            <p>Spicy truths & silly dares — couples edition!</p>
+            <span class="card-badge badge-sweet">Sweet</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Arenas -->
+      <!-- Tic Tac Toe Arena -->
+      <div class="game-arena" id="arena-tictactoe">
+        <div class="arena-header">
+          <h2>❌⭕ Tic Tac Toe</h2>
+          <button class="btn-back" onclick="closeGame()">← Back to Games</button>
+        </div>
+        <div class="arena-body" id="ttt-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Memory Match Arena -->
+      <div class="game-arena" id="arena-memory">
+        <div class="arena-header">
+          <h2>🧠 Memory Match</h2>
+          <button class="btn-back" onclick="closeGame()">← Back to Games</button>
+        </div>
+        <div class="arena-body" id="memory-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Rock Paper Scissors Arena -->
+      <div class="game-arena" id="arena-rps">
+        <div class="arena-header">
+          <h2>✂️ Rock Paper Scissors</h2>
+          <button class="btn-back" onclick="closeGame()">← Back to Games</button>
+        </div>
+        <div class="arena-body" id="rps-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Truth or Dare Arena -->
+      <div class="game-arena" id="arena-truthdare">
+        <div class="arena-header">
+          <h2>🎭 Truth or Dare</h2>
+          <button class="btn-back" onclick="closeGame()">← Back to Games</button>
+        </div>
+        <div class="arena-body" id="tod-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: LEADERBOARD ===== -->
+    <div class="tab-content" id="tab-leaderboard">
+      <div class="leaderboard-section" id="leaderboard-content">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ===== TAB: LOVE NOTES ===== -->
+    <div class="tab-content" id="tab-notes">
+      <div class="notes-section">
+
+        <!-- Composer -->
+        <div class="note-composer">
+          <h3>✍️ Write a Love Note</h3>
+          <textarea id="note-textarea" placeholder="Write something sweet, funny, or romantic..."></textarea>
+          <div class="note-options">
+            <div class="note-from">
+              <span style="font-size: 0.85rem; color: var(--text-secondary);">From:</span>
+              <select id="note-from-select"></select>
+            </div>
+            <div class="note-mood-picker">
+              <button type="button" class="mood-btn selected" onclick="selectMood('💖', this)">💖</button>
+              <button type="button" class="mood-btn" onclick="selectMood('😍', this)">😍</button>
+              <button type="button" class="mood-btn" onclick="selectMood('🤭', this)">🤭</button>
+              <button type="button" class="mood-btn" onclick="selectMood('🥺', this)">🥺</button>
+              <button type="button" class="mood-btn" onclick="selectMood('🔥', this)">🔥</button>
+              <button type="button" class="mood-btn" onclick="selectMood('😘', this)">😘</button>
+            </div>
+            <button type="button" class="btn-send-note" onclick="sendNote()">Send 💌</button>
+          </div>
+        </div>
+
+        <!-- Notes Timeline -->
+        <div class="notes-timeline" id="notes-timeline">
+          <!-- Rendered by JS -->
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

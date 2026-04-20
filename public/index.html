@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Luva — Play fun couples games remotely, keep score, and exchange love notes in real-time.">
+  <meta name="theme-color" content="#0f0a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Luva 💕 Love Games & Notes</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Floating Hearts Background -->
+  <div id="floating-hearts" class="floating-hearts"></div>
+
+  <!-- Toast Notifications -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ===== LANDING SCREEN ===== -->
+  <div id="view-landing" class="view active">
+    <div class="landing-container">
+      <div class="landing-hero">
+        <span class="logo-icon">💕</span>
+        <h1 class="brand-title">Luva</h1>
+        <p class="brand-tagline">games, giggles & love notes for two</p>
+        <p class="brand-sub">Play together — even when you're apart 💫</p>
+      </div>
+
+      <div class="landing-actions">
+        <button class="btn-landing btn-create" id="btn-go-create" onclick="showView('creating')">
+          <span class="btn-emoji">🏠</span>
+          <span class="btn-text">
+            <strong>Create a Room</strong>
+            <small>Get a code to share with your love</small>
+          </span>
+        </button>
+
+        <div class="landing-divider"><span>or</span></div>
+
+        <button class="btn-landing btn-join" id="btn-go-join" onclick="showView('joining')">
+          <span class="btn-emoji">💌</span>
+          <span class="btn-text">
+            <strong>Join a Room</strong>
+            <small>Enter a code from your partner</small>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CREATE ROOM SCREEN ===== -->
+  <div id="view-creating" class="view">
+    <div class="setup-card">
+      <button class="btn-back-small" onclick="showView('landing')">← Back</button>
+      <span class="logo-icon small">🏠</span>
+      <h2>Create a Room</h2>
+      <p class="setup-sub">Set up your name and avatar, then share the code!</p>
+
+      <form class="setup-form" onsubmit="event.preventDefault(); createRoom();">
+        <div class="input-group">
+          <label for="create-name">Your Name</label>
+          <input type="text" id="create-name" placeholder="Enter your name..." maxlength="20" autocomplete="off" required>
+        </div>
+        <div class="emoji-picker-row" id="create-emoji-picker"></div>
+        <button type="submit" class="btn-primary" id="btn-create-room">Create Room 💕</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== JOIN ROOM SCREEN ===== -->
+  <div id="view-joining" class="view">
+    <div class="setup-card">
+      <button class="btn-back-small" onclick="showView('landing')">← Back</button>
+      <span class="logo-icon small">💌</span>
+      <h2>Join a Room</h2>
+      <p class="setup-sub">Enter the code your partner shared with you!</p>
+
+      <form class="setup-form" onsubmit="event.preventDefault(); joinRoom();">
+        <div class="input-group">
+          <label for="join-code">Room Code</label>
+          <input type="text" id="join-code" placeholder="e.g. LOVE42" maxlength="6" autocomplete="off" required
+                 style="text-transform: uppercase; text-align: center; font-size: 1.4rem; font-weight: 700; letter-spacing: 4px;">
+        </div>
+        <div class="input-group">
+          <label for="join-name">Your Name</label>
+          <input type="text" id="join-name" placeholder="Enter your name..." maxlength="20" autocomplete="off" required>
+        </div>
+        <div class="emoji-picker-row" id="join-emoji-picker"></div>
+        <button type="submit" class="btn-primary" id="btn-join-room">Join Room 💝</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== WAITING SCREEN ===== -->
+  <div id="view-waiting" class="view">
+    <div class="waiting-container">
+      <div class="waiting-anim">
+        <span class="waiting-heart">💕</span>
+      </div>
+      <h2>Waiting for your partner...</h2>
+      <p class="waiting-sub">Share this code with your love:</p>
+      <div class="room-code-display" id="waiting-room-code">
+        <span class="code-text" id="code-display-text">------</span>
+        <button class="btn-copy" onclick="copyRoomCode()" title="Copy code">📋</button>
+      </div>
+      <button class="btn-share" onclick="shareRoomCode()" id="btn-share">Share Code 💌</button>
+      <p class="waiting-hint">Once they join, the fun begins! ✨</p>
+    </div>
+  </div>
+
+  <!-- ===== MAIN APP ===== -->
+  <div id="view-playing" class="view">
+    <div class="app-container main-content">
+
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-brand">
+          <span class="brand-icon">💕</span>
+          <h1>Luva</h1>
+        </div>
+        <div class="header-players">
+          <span class="player-tag p1" id="header-p1"></span>
+          <span class="vs">&</span>
+          <span class="player-tag p2" id="header-p2"></span>
+          <span class="connection-dot" id="connection-dot" title="Partner online"></span>
+        </div>
+        <div class="header-actions">
+          <button class="btn-icon" id="btn-show-code" onclick="toggleRoomInfo()" title="Room code">🔗</button>
+          <button class="btn-icon" id="btn-leave" onclick="leaveRoom()" title="Leave room">🚪</button>
+        </div>
+      </header>
+
+      <!-- Room info banner (hidden by default) -->
+      <div class="room-info-banner" id="room-info-banner" style="display:none;">
+        <span>Room: <strong id="banner-code"></strong></span>
+        <button class="btn-copy-sm" onclick="copyRoomCode()">Copy</button>
+        <button class="btn-close-banner" onclick="document.getElementById('room-info-banner').style.display='none'">✕</button>
+      </div>
+
+      <!-- Partner disconnected banner -->
+      <div class="disconnect-banner" id="disconnect-banner" style="display:none;">
+        <span>⏳ Your partner disconnected — waiting for them to come back...</span>
+      </div>
+
+      <!-- Score Strip -->
+      <div class="score-strip" id="score-strip"></div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs" id="nav-tabs">
+        <button class="nav-tab active" data-tab="games" onclick="setActiveTab('games')">
+          <span class="tab-icon">🎮</span>
+          <span class="tab-label">Games</span>
+        </button>
+        <button class="nav-tab" data-tab="leaderboard" onclick="setActiveTab('leaderboard')">
+          <span class="tab-icon">🏆</span>
+          <span class="tab-label">Scores</span>
+        </button>
+        <button class="nav-tab" data-tab="notes" onclick="setActiveTab('notes')">
+          <span class="tab-icon">💌</span>
+          <span class="tab-label">Notes</span>
+        </button>
+      </nav>
+
+      <!-- ===== TAB: GAMES ===== -->
+      <div class="tab-content active" id="tab-games">
+        <div id="games-list">
+          <div class="games-grid">
+            <div class="game-card" onclick="startGame('tictactoe')" id="card-tictactoe">
+              <span class="card-emoji">❌⭕</span>
+              <h3>Tic Tac Toe</h3>
+              <p>Classic battle — who's the strategic genius?</p>
+              <span class="card-badge badge-fun">Fun</span>
+            </div>
+            <div class="game-card" onclick="startGame('memory')" id="card-memory">
+              <span class="card-emoji">🧠</span>
+              <h3>Memory Match</h3>
+              <p>Flip cards & find pairs — test your memory!</p>
+              <span class="card-badge badge-brain">Brain</span>
+            </div>
+            <div class="game-card" onclick="startGame('rps')" id="card-rps">
+              <span class="card-emoji">✂️</span>
+              <h3>Rock Paper Scissors</h3>
+              <p>Best of 3 — pick at the same time!</p>
+              <span class="card-badge badge-quick">Quick</span>
+            </div>
+            <div class="game-card" onclick="startGame('truthdare')" id="card-truthdare">
+              <span class="card-emoji">🎭</span>
+              <h3>Truth or Dare</h3>
+              <p>Spicy truths & silly dares — couples edition!</p>
+              <span class="card-badge badge-sweet">Sweet</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game Arena (shown when a game is active) -->
+        <div class="game-arena" id="game-arena" style="display:none;">
+          <div class="arena-header">
+            <h2 id="arena-title">Game</h2>
+            <button class="btn-back" onclick="closeGame()">← Back</button>
+          </div>
+          <div class="arena-body" id="arena-body">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB: LEADERBOARD ===== -->
+      <div class="tab-content" id="tab-leaderboard">
+        <div class="leaderboard-section" id="leaderboard-content"></div>
+      </div>
+
+      <!-- ===== TAB: LOVE NOTES ===== -->
+      <div class="tab-content" id="tab-notes">
+        <div class="notes-section">
+          <div class="note-composer">
+            <h3>✍️ Write a Love Note</h3>
+            <textarea id="note-textarea" placeholder="Write something sweet, funny, or romantic..." maxlength="1000"></textarea>
+            <div class="note-options">
+              <div class="note-mood-picker">
+                <button type="button" class="mood-btn selected" onclick="selectMood('💖', this)">💖</button>
+                <button type="button" class="mood-btn" onclick="selectMood('😍', this)">😍</button>
+                <button type="button" class="mood-btn" onclick="selectMood('🤭', this)">🤭</button>
+                <button type="button" class="mood-btn" onclick="selectMood('🥺', this)">🥺</button>
+                <button type="button" class="mood-btn" onclick="selectMood('🔥', this)">🔥</button>
+                <button type="button" class="mood-btn" onclick="selectMood('😘', this)">😘</button>
+              </div>
+              <button type="button" class="btn-send-note" onclick="sendNote()">Send 💌</button>
+            </div>
+          </div>
+          <div class="notes-timeline" id="notes-timeline"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

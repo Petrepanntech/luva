@@ -1,0 +1,4 @@
+node_modules/
+luva.db
+.env
+*.log
